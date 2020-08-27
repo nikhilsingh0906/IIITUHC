@@ -54,7 +54,65 @@ let routeFunction = passport => {
     .delete((req, res, next) => {
       badMethod(req);
     });
+          router
+    .route("/appointment")
+    // .get((req, res, next) => {
+    //     res.render("appointment");
+    //   })
+      .post((req, res, next) => {
+      appointment
+                .create({
+                  name: req.body.name,
+                  email: req.body.email,
+                  branch:req.body.branch,
+                  description:req.body.description,
+                  symptoms:req.body.symptoms,
+                  allergies:req.body.allergies,
+                  year:req.body.year,
+                  mobile:req.body.mobile,
+                  date:req.body.date
+                  
+                })
+                .then(user => {
+                  console.log("Appointment Saved");
+                 
+                  res.statusCode = 201;
+                  res.render("appointment", {
+                    error: req.flash("error"),
+                    success:req.flash("success"),
+                    user:req.user
+                  });
+                  
+                })
+                .catch(err => {
+                  console.log(err);
+                });
+              });
+ router
+      .route("/appointmentPrint/:patientEmail")
 
+      .get((req, res)=>{
+
+        const requestedStudentId = req.params.patientEmail;
+        //db.collection.findOne({"$query":{},"$orderby":{ "_id": -1 }})
+        //let student=appointment.find({}).sort({'timestamps':-1}).limit(1);
+          appointment.findOne({email:requestedStudentId}).sort({'_id':-1}).limit(1).exec(function(err, appointmentD){
+          //if(student){  
+          console.log(appointmentD);
+            res.render("appointmentPrint",{
+              name: appointmentD.name,
+              branch: appointmentD.branch,
+              email:appointmentD.email,
+              description:appointmentD.description,
+              allergies:appointmentD.allergies,
+              symptoms:appointmentD.symptoms,
+              year:appointmentD.year,
+              date:appointmentD.date
+            });
+            
+          });
+        
+        });
   // User registration page
 
   router
